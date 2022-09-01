@@ -1,5 +1,4 @@
-#!/bin/bash
-chmod -R ugo+X .
+#!/bin/bash\n chmod
 
 
 
