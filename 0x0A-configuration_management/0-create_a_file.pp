@@ -1,4 +1,4 @@
-# This manifest creates a file at /tmp
+# file to create tmp/school
 file { '/tmp/school':
     ensure  => 'file',
     owner   => 'www-data',
