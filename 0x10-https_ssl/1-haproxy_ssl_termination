@@ -33,15 +33,13 @@ defaults
 	errorfile 503 /etc/haproxy/errors/503.http
 	errorfile 504 /etc/haproxy/errors/504.http
 
-frontend  ehoneah-frontend-http
+frontend bstar00-frontend-http
         bind *:80
         mode http
-	http-request set-header X-Forwarded-Proto http
         default_backend bstar00-backend
 
 frontend bstar00-frontend-https
 	bind *:443 ssl crt /etc/haproxy/certs/www.bstar00.tech.pem
-	http-request set-header X-Forwarded-Proto https
 	default_backend bstar00-backend
 
 backend bstar00-backend
