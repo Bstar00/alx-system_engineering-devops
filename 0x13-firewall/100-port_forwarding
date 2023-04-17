@@ -1,15 +1,9 @@
-sudo ufw status
-sudo ufw default deny incoming
-sudo ufw default allow outgoing
-sudo ufw allow 22/tcp
-sudo ufw allow 80/tcp
-sudo ufw allow /443/tcp
-sudo ufw enable
 sudo vim /etc/systcl.conf
 #port forwarding FROM 8080 TO PORT 80
 *nat
-REROUTING ACCEPT [0:0]
+:REROUTING ACCEPT [0:0]
 -A PREPROUTING -p tcp --dport 8080 -j REDIRECT --to-port 80
 COMMIT
 #enable ipv4 port forwarding
-sudo vim /etc/sysctl.conf
+# echo 'net/ipv4/ip_forward=1' >> /etc/ufw/sysctl.conf
+sudo ufw reload
