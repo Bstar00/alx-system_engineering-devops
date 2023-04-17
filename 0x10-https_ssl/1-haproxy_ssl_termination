@@ -41,4 +41,8 @@ backend letsencrypt
 backend bstar00-backend
         balance roundrobin
         server 63210-web-01 52.91.119.169:80 check
+<<<<<<< HEAD
 	server 63210-web-02 3.84.161.196:80 check
+=======
+	 server 63210-web-02 3.84.161.196:80 check
+>>>>>>> 9ff017652205e8d1c65d75101cc87682a31a5eab
