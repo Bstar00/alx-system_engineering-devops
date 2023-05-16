@@ -1,1 +1,1 @@
- Install MySQL on web-01 and web-02
+Installation of MYSQL on web-01 and web-02
