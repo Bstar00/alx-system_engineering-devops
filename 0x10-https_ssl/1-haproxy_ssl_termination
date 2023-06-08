@@ -26,23 +26,21 @@ defaults
         timeout client  50000
         timeout server  50000
 
-frontend  bstar00-frontend
+frontend web-front
         bind *:80
-        mode http
-        default_backend bstar00-backend
-frontend https-in
-        bind *:443 ssl crt /etc/haproxy/ssl-certs/bstar00.tech.pem
-        reqadd X-Forwarded-Proto:\ https
-        acl letsencrypt-req path_beg /.well-known/acme-challenge/
-        use_backend letsencrypt if letsencrypt-req
-        default_backend backend_servers
-backend letsencrypt
-        server letsencrypt 127.0.0.1:9785
-backend bstar00-backend
+	mode http
+	reqadd X-Forwarded-Proto:\ http
+	default_backend web-backend
+frontend web-front
+        bind *:443 ssl crt /etc/haproxy/certs/www.bstar00.tech.pem
+	reqadd X-Forwarded-Proto:\ https
+        acl letsencrypt-acl path_beg /.well-known/acme-challenge/
+        use_backend letsencrypt-backend if letsencrypt-acl
+	default_backend web-backend
+backend web-backend
         balance roundrobin
-        server 63210-web-01 52.91.119.169:80 check
-<<<<<<< HEAD
-	server 63210-web-02 3.84.161.196:80 check
-=======
-	 server 63210-web-02 3.84.161.196:80 check
->>>>>>> 9ff017652205e8d1c65d75101cc87682a31a5eab
+	redirect scheme https if !{ ssl_fc }
+        server 63210-web-01 54.237.78.38:80 check
+	server 63210-web-02 34.207.64.44:80 check
+backend letsencrypt-backend
+        server letsencrypt 127.0.0.1:54321

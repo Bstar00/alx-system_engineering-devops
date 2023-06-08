@@ -1,5 +1,4 @@
-# Use Puppet to automate the task of creating a custom HTTP header response
-
+# custom http header response NGiNX
 exec {'update':
   command => '/usr/bin/apt-get update',
 }
@@ -11,6 +10,6 @@ exec {'update':
   match => 'http {',
   line  => "http {\n\tadd_header X-Served-By \"${hostname}\";",
 }
--> exec {'run':
+-> exec {'run2':
   command => '/usr/sbin/service nginx restart',
 }
