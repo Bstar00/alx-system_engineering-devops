@@ -1,19 +1,65 @@
-#!/usr/bin/env bash
-#configures a new Ubuntu machine nginx
-apt-get update
-apt-get install software-properties-common -y
-add-apt-repository ppa:vbernat/haproxy-1.7 -y
-apt-get update
-apt-get install haproxy=2.0.\* -y
-echo "frontend web-front
-        bind *:80
-        default_backend web-backend
-backend web-backend
-        balance roundrobin
-        server web-01 54.237.78.38:80 check
-        server web-02 34.207.64.44:80 check
-" | sudo tee -a /etc/haproxy/haproxy.cfg
-# enable haproxy to be started by init script
-echo "ENABLED=1" | sudo tee -a /etc/default/haproxy
 
-sudo service haproxy restart
+
+#!/usr/bin/env bash
+
+# Exit on error
+set -e
+
+echo "Updating package list..."
+sudo apt-get update
+
+echo "Installing required packages..."
+sudo apt-get install -y software-properties-common
+
+# Add repository for HAProxy 2.0 (using official one if available)
+echo "Adding HAProxy 2.0 PPA..."
+sudo add-apt-repository ppa:vbernat/haproxy-2.0 -y
+sudo apt-get update
+
+echo "Installing HAProxy 2.0..."
+sudo apt-get install -y haproxy=2.0.\*
+
+# Backup existing configuration
+echo "Backing up original HAProxy configuration..."
+sudo cp /etc/haproxy/haproxy.cfg /etc/haproxy/haproxy.cfg.bak
+
+# Write configuration (overwrites instead of appending for idempotency)
+echo "Writing new HAProxy configuration..."
+sudo tee /etc/haproxy/haproxy.cfg > /dev/null <<EOF
+global
+    log /dev/log local0
+    log /dev/log local1 notice
+    chroot /var/lib/haproxy
+    stats timeout 30s
+    user haproxy
+    group haproxy
+    daemon
+
+defaults
+    log     global
+    mode    http
+    option  httplog
+    option  dontlognull
+    timeout connect 5000
+    timeout client  50000
+    timeout server  50000
+
+frontend web-front
+    bind *:80
+    default_backend web-backend
+
+backend web-backend
+    balance roundrobin
+    server web-01 54.237.78.38:80 check
+    server web-02 34.207.64.44:80 check
+EOF
+
+# Enable HAProxy to start on boot
+echo "Enabling HAProxy in default config..."
+sudo sed -i 's/ENABLED=0/ENABLED=1/' /etc/default/haproxy || echo "ENABLED=1" | sudo tee -a /etc/default/haproxy
+
+# Restart HAProxy to apply changes
+echo "Restarting HAProxy..."
+sudo systemctl restart haproxy
+
+echo "HAProxy setup completed successfully!"
